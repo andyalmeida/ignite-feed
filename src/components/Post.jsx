@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { format, formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
@@ -7,6 +8,11 @@ import { Comment } from "./Comment";
 import styles from './Post.module.css';
 
 export function Post({author, content, publishedAt}) {
+  const [comments, setComments] = useState([
+    'Muito bom o post, parabéns!! 👏👏'
+  ]);
+  const [commentText, setCommentText] = useState('');
+
   const publishedAtFormatted = format(publishedAt, "dd 'de' MMMM 'de' yyyy 'às' HH:mm'h'", {
     locale: ptBR
   });
@@ -14,6 +20,12 @@ export function Post({author, content, publishedAt}) {
     locale: ptBR,
     addSuffix: true
   });
+
+  function handleCreateNewComment() {
+    event.preventDefault();
+    setComments([...comments, commentText]);
+    setCommentText('');
+  }
 
   return (
     <article className={styles.post}>
@@ -39,18 +51,28 @@ export function Post({author, content, publishedAt}) {
         })}
       </div>
 
-      <form className={styles.commentForm}>
+      <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
         <strong>Deixe seu feedback</strong>
-        <textarea placeholder="Escreva um comentário..." />
+        <textarea
+          name="comment"
+          placeholder="Escreva um comentário..."
+          value={commentText}
+          onChange={event => setCommentText(event.target.value)}
+        />
         <footer>
           <button type="submit">Publicar</button>
         </footer>
       </form>
 
       <div className={styles.commentList}>
-        <Comment />
-        <Comment />
-        <Comment />
+        { comments.map(comment => {
+          return (
+            <Comment
+              key={comment}
+              content={comment}
+            />
+        )
+        })}
       </div>
     </article>
   );
